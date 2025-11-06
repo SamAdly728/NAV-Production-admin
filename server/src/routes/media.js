@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { uploadBuffer, s3 } = require('../s3');
+const { uploadBuffer, provider } = require('../storage');
 const { prisma } = require('../config');
 const { authenticate } = require('../middleware/auth');
 
@@ -30,11 +30,11 @@ router.post('/upload', authenticate, upload.single('file'), async (req, res) => 
     }
 
     let url;
-    console.log('proceeding to upload to S3? s3=', !!s3);
-    if (s3) {
+    console.log('proceeding to upload; provider=', provider);
+    if (uploadBuffer) {
       url = await uploadBuffer(buffer, originalname, mimetype);
     } else {
-      return res.status(500).json({ error: 'S3 not configured; set S3_* env vars' });
+      return res.status(500).json({ error: 'storage provider not configured; set STORAGE_PROVIDER or provider env vars' });
     }
     const media = await prisma.media.create({
       data: {
