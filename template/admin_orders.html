@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>NAV Admin - Orders</title>
+  <link href="../assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+  <h3>Orders</h3>
+  <div id="orders"></div>
+  <script>
+    async function load(){
+      const token = localStorage.getItem('nav_token');
+      const res = await fetch('/api/admin/orders', { headers: { Authorization: 'Bearer '+token }});
+      if (res.status === 401 || res.status === 403) return document.getElementById('orders').innerText = 'Unauthorized';
+      const j = await res.json();
+      const el = document.getElementById('orders');
+      el.innerHTML = '<ul>' + j.orders.map(o => `<li>${o.id} - ${o.status} - $${(o.totalCents/100).toFixed(2)} - media:${o.media.length}</li>`).join('') + '</ul>';
+    }
+    load();
+  </script>
+</body>
+</html>

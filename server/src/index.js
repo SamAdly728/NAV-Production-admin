@@ -7,6 +7,7 @@ const authRoutes = require('./routes/auth');
 const healthRoutes = require('./routes/health');
 const mediaRoutes = require('./routes/media');
 const paymentsRoutes = require('./routes/payments');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use('/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/payments', paymentsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Serve the admin template statically from the template folder
 const path = require('path');

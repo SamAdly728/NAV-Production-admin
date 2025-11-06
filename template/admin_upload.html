@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>NAV Admin - Upload Media</title>
+  <link href="../assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+  <h3>Upload media for order</h3>
+  <form id="uform">
+    <div class="mb-2"><label>Order ID</label><input name="orderId" class="form-control"/></div>
+    <div class="mb-2"><label>File</label><input name="file" type="file" class="form-control"/></div>
+    <div class="mb-2"><label>Kind</label><select name="kind" class="form-control"><option value="image">image</option><option value="video">video</option></select></div>
+    <button class="btn btn-primary" type="submit">Upload</button>
+  </form>
+  <div id="msg" class="mt-3"></div>
+  <script>
+    document.getElementById('uform').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const f = document.querySelector('input[name=file]').files[0];
+      const orderId = document.querySelector('input[name=orderId]').value;
+      const kind = document.querySelector('select[name=kind]').value;
+      if (!f) return alert('choose file');
+      const fd = new FormData(); fd.append('file', f); if (orderId) fd.append('orderId', orderId); fd.append('kind', kind);
+      const token = localStorage.getItem('nav_token');
+      const res = await fetch('/api/media/upload', { method: 'POST', headers: { Authorization: 'Bearer '+token }, body: fd });
+      const j = await res.json();
+      document.getElementById('msg').innerText = res.ok ? 'Uploaded: ' + j.media.url : 'Error: ' + (j.error||'');
+    });
+  </script>
+</body>
+</html>
