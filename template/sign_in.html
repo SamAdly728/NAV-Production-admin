@@ -102,7 +102,7 @@
                                     </div>
                                 </div>
                                 <div class="col-12 mt-3">
-                                        <a class="btn btn-primary btn-lg w-100" href="./index.html" role="button">Sign In</a>
+                                                                                    <button id="signinBtn" class="btn btn-primary btn-lg w-100" type="button">Sign in</button>
                                 </div>
                                 <div class="col-12 mt-4">
                                     <div class="text-center text-lg-start f-w-500">
@@ -114,6 +114,35 @@
                                 <div class="app-divider-v light justify-content-center py-lg-5 py-3">
                                     <p>OR</p>
                                 </div>
+
+            <script>
+            // Minimal login handler: posts to /api/auth/login and stores token in localStorage
+            (function(){
+                const btn = document.getElementById('signinBtn');
+                if (!btn) return;
+                btn.addEventListener('click', async function(){
+                    const email = document.querySelector('input[type="text"]').value; // Changed to match the input type for email
+                    const password = document.querySelector('input[type="password"]').value;
+                    if (!email || !password) { alert('Email and password required'); return; }
+                    try {
+                        const res = await fetch('/api/auth/login', {
+                            method: 'POST',
+                            headers: {'Content-Type':'application/json'},
+                            body: JSON.stringify({ email, password })
+                        });
+                        const data = await res.json();
+                        if (!res.ok) { alert(data.error || 'Login failed'); return; }
+                        // store token
+                        localStorage.setItem('nav_token', data.token);
+                        // redirect to app dashboard
+                        window.location.href = '/app';
+                    } catch (err) {
+                        console.error(err);
+                        alert('Network error');
+                    }
+                });
+            })();
+            </script>
 
                                 <div class="col-12">
                                     <div class="d-flex gap-3 justify-content-center text-center">
