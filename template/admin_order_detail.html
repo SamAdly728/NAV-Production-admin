@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>NAV Admin - Order Detail</title>
+  <link href="../assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+  <a href="/admin_orders.html" class="btn btn-link">← Back to orders</a>
+  <h3 id="title">Order</h3>
+  <div id="order"></div>
+  <div class="mt-3">
+    <label>Status</label>
+    <select id="status" class="form-control" style="max-width:300px"></select>
+    <button id="save" class="btn btn-primary mt-2">Save</button>
+  </div>
+  <div id="msg" class="mt-3"></div>
+
+  <script>
+    const allowed = ['new','in_progress','completed','cancelled'];
+    function getId(){ const p = new URLSearchParams(location.search); return p.get('id'); }
+    async function load(){
+      const id = getId();
+      if (!id) return document.getElementById('order').innerText = 'missing id';
+      const token = localStorage.getItem('nav_token');
+      const res = await fetch('/api/admin/orders/'+encodeURIComponent(id), { headers: { Authorization: 'Bearer '+token }});
+      if (res.status === 401 || res.status === 403) return document.getElementById('order').innerText = 'Unauthorized';
+      if (res.status === 404) return document.getElementById('order').innerText = 'Not found';
+      const j = await res.json();
+      const o = j.order;
+      document.getElementById('title').innerText = 'Order '+o.id;
+      const el = document.getElementById('order');
+      el.innerHTML = `
+        <div><strong>Client:</strong> ${o.client?.email || 'unknown'}</div>
+        <div><strong>Description:</strong> ${o.description || ''}</div>
+        <div><strong>Total:</strong> $${(o.totalCents/100).toFixed(2)}</div>
+        <div><strong>Created:</strong> ${new Date(o.createdAt).toLocaleString()}</div>
+        <div class="mt-2"><strong>Media</strong><div>${o.media.map(m=>`<div><a href="${m.url}" target="_blank">${m.url}</a></div>`).join('')}</div></div>
+      `;
+
+      const sel = document.getElementById('status'); sel.innerHTML = '';
+      for(const s of allowed){ const opt = document.createElement('option'); opt.value = s; opt.innerText = s; if (s===o.status) opt.selected=true; sel.appendChild(opt); }
+    }
+    document.getElementById('save').addEventListener('click', async ()=>{
+      const id = getId(); const status = document.getElementById('status').value;
+      const token = localStorage.getItem('nav_token');
+      const res = await fetch('/api/admin/orders/'+encodeURIComponent(id), { method: 'PUT', headers: { 'Content-Type':'application/json', Authorization: 'Bearer '+token }, body: JSON.stringify({ status }) });
+      const j = await res.json();
+      if (!res.ok) return document.getElementById('msg').innerText = 'Error: '+(j.error||'');
+      document.getElementById('msg').innerText = 'Saved';
+      load();
+    });
+    load();
+  </script>
+</body>
+</html>

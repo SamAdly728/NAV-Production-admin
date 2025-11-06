@@ -8,16 +8,36 @@
 </head>
 <body class="p-4">
   <h3>Clients</h3>
+  <div class="mb-3 row">
+    <div class="col-sm-6"><input id="q" class="form-control" placeholder="search by name or email"/></div>
+    <div class="col-sm-2"><button id="searchBtn" class="btn btn-primary">Search</button></div>
+  </div>
   <div id="clients"></div>
+  <nav><ul id="pager" class="pagination"></ul></nav>
   <script>
+    let page = 1, limit = 20;
     async function load(){
       const token = localStorage.getItem('nav_token');
-      const res = await fetch('/api/admin/clients', { headers: { Authorization: 'Bearer '+token }});
+      const q = document.getElementById('q').value || '';
+      const res = await fetch(`/api/admin/clients?q=${encodeURIComponent(q)}&page=${page}&limit=${limit}`, { headers: { Authorization: 'Bearer '+token }});
       if (res.status === 401 || res.status === 403) return document.getElementById('clients').innerText = 'Unauthorized';
       const j = await res.json();
       const el = document.getElementById('clients');
-      el.innerHTML = '<ul>' + j.users.map(u => `<li>${u.email} — ${u.name || ''} — ${u.role}</li>`).join('') + '</ul>';
+      if (!j.users.length) return el.innerHTML = '<div class="alert alert-info">No clients</div>';
+      el.innerHTML = '<ul class="list-group">' + j.users.map(u => `<li class="list-group-item">${u.email} — ${u.name || ''} — ${u.role} — ${new Date(u.createdAt).toLocaleString()}</li>`).join('') + '</ul>';
+
+      // pager
+      const pager = document.getElementById('pager');
+      pager.innerHTML = '';
+      const total = j.total || 0;
+      const pages = Math.max(1, Math.ceil(total / limit));
+      for(let p=1;p<=pages && p<=10;p++){
+        const li = document.createElement('li'); li.className = 'page-item'+(p===page?' active':'');
+        const a = document.createElement('a'); a.className='page-link'; a.href='#'; a.innerText=p; a.onclick=(ev)=>{ ev.preventDefault(); page=p; load(); };
+        li.appendChild(a); pager.appendChild(li);
+      }
     }
+    document.getElementById('searchBtn').addEventListener('click', ()=>{ page = 1; load(); });
     load();
   </script>
 </body>
