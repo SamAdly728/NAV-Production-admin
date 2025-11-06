@@ -1,0 +1,50 @@
+# Render manifest for NAV-Production-admin
+# Fill secrets in the Render dashboard (do NOT commit secrets in the repo).
+
+services:
+  - type: web
+    name: nav-productions-web
+    env: node
+    region: oregon
+    plan: starter
+    repo: https://github.com/SamAdly728/NAV-Production-admin
+    branch: main
+    root: server
+    buildCommand: ''
+    startCommand: "npx prisma generate && npx prisma migrate deploy && npm run start"
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        value: ''
+      - key: JWT_SECRET
+        value: ''
+      - key: NODE_ENV
+        value: 'production'
+      - key: STORAGE_PROVIDER
+        value: 'dropbox'
+      - key: DROPBOX_ACCESS_TOKEN
+        value: ''
+      - key: S3_BUCKET
+        value: ''
+      - key: S3_REGION
+        value: ''
+      - key: S3_ACCESS_KEY_ID
+        value: ''
+      - key: S3_SECRET_ACCESS_KEY
+        value: ''
+      - key: STRIPE_SECRET
+        value: ''
+      - key: STRIPE_PUBLISHABLE_KEY
+        value: ''
+      - key: STRIPE_WEBHOOK_SECRET
+        value: ''
+      - key: ADMIN_EMAIL
+        value: ''
+      - key: ADMIN_PASSWORD
+        value: ''
+
+databases:
+  - name: nav-productions-db
+    engine: postgresql
+    version: '14'
+    plan: starter
