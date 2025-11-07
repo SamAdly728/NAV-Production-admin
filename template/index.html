@@ -45,6 +45,12 @@
     <!-- Responsive css-->
     <link href="../assets/css/responsive.css" rel="stylesheet" type="text/css">
 
+    <style>
+        .app-logo img {
+            margin-bottom: 0; /* Remove any bottom margin */
+            padding-bottom: 0; /* Remove any bottom padding */
+        }
+    </style>
 </head>
 
 <body>
@@ -1494,7 +1500,7 @@
 
                                 <li class="d-flex align-items-center">
                                     <div class="b-1-light bg-primary-200 p-1 h-40 w-40 d-flex-center b-r-12 flex-shrink-0 overflow-hidden box-list-img">
-                                        <img alt="Smart Watch"
+                                                                                                                                                             <img alt="Smart Watch"
                                              class="img-fluid"
                                              src="../assets/images/dashboard/ecommerce-dashboard/product/06.png">
                                     </div>
@@ -1699,26 +1705,6 @@
     <!-- Footer Section starts-->
     <footer>
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-6 col-12 mb-3">
-                    <h6 class="f-w-600">NAV PRODUCTIONS</h6>
-                    <p class="mb-0">2159 India St, San Diego, CA 92101</p>
-                    <p class="mb-0">Email: <a href="mailto:info@nav-productions.com">info@nav-productions.com</a></p>
-                    <p class="mb-0">Phone: <a href="tel:+18585001050">(858) 500-1050</a></p>
-                </div>
-                <div class="col-md-3 col-6 mb-3">
-                    <h6 class="f-w-600">Office Hours</h6>
-                    <p class="mb-0">Mon–Fri: 8am–6pm</p>
-                    <p class="mb-0">Sat: 9am–3pm</p>
-                    <p class="mb-0">Sun: Closed</p>
-                </div>
-                <div class="col-md-3 col-6 mb-3">
-                    <h6 class="f-w-600">Field Hours</h6>
-                    <p class="mb-0">Mon–Fri: 8am–8pm</p>
-                    <p class="mb-0">Sat: 9am–5pm</p>
-                    <p class="mb-0">Sun: Closed</p>
-                </div>
-            </div>
             <div class="row mt-3">
                 <div class="col-12 text-center">
                     <p class="footer-text f-w-600 mb-0">Copyright © 2025 NAV Productions. All rights reserved.</p>
@@ -1798,6 +1784,26 @@
             .then(data => {
                 if (!data || !data.user) return; // not logged in
                 const role = data.user.role;
+                        if (role === 'admin') window.location.href = '/admin_orders.html';
+                        else window.location.href = '/client_dashboard.html';
+            }).catch(()=>{});
+    })();
+</script>
+
+    <script>
+        // hide admin links for non-admin users in the nav
+        (function(){
+            fetch('/api/auth/whoami', { credentials: 'same-origin' })
+                .then(r => r.ok ? r.json() : null)
+                .then(data => {
+                    if (!data || !data.user) return;
+                    if (data.user.role === 'admin') return; // admins keep links
+                    // remove or hide links that point to admin pages
+                    document.querySelectorAll('a[href*="admin_"]').forEach(a=>{
+                        const li = a.closest('li');
+                        if (li) li.remove(); else a.remove();
+                    });
+                    document.querySelectorAll('a[href*="/admin/"]').forEach(a=>{ const li = a.closest('li'); if (li) li.remove(); else a.remove(); });
                         if (role === 'admin') window.location.href = '/admin_orders.html';
                         else window.location.href = '/client_dashboard.html';
             }).catch(()=>{});
