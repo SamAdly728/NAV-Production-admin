@@ -34803,3 +34803,27 @@ body.dark nav .app-logo .logo img {
   height: 36px;
 }
 
+
+/* NAV profile tweaks: reduce gap, hide subtitle, and display unified name */
+.nav-profile {
+  padding: 0.35rem !important; /* tighten the vertical gap */
+}
+.app-logo .logo { margin-bottom: 0 !important; }
+.app-logo .logo img { margin-bottom: 0 !important; }
+
+/* hide the original name text and inject Sam Adly consistently */
+.nav-profile .flex-grow-1 h6 {
+  color: transparent !important;
+  position: relative;
+  margin: 0 !important;
+}
+.nav-profile .flex-grow-1 h6::after {
+  content: 'Sam Adly';
+  color: rgba(var(--primary), 1);
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 600;
+}
+.nav-profile .flex-grow-1 p { display: none !important; }
+
