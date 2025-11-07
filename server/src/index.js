@@ -45,6 +45,23 @@ app.get(['/admin_*.html', '/admin/*'], authenticate, (req, res, next) => {
 // Serve static assets and template pages
 app.use(express.static(templateDir));
 
+// Serve shared assets (images, css, js) from the project's assets folder if present
+const assetCandidates = [
+  path.join(__dirname, '..', '..', 'assets'), // projectRoot/assets
+  path.join(__dirname, '..', 'assets'), // server/assets
+  path.join(process.cwd(), 'assets'), // cwd/assets
+  path.join(__dirname, '..', '..', '..', 'assets')
+];
+let assetDir = assetCandidates.find(d => {
+  try { return fs.existsSync(d); } catch (e) { return false; }
+});
+if (!assetDir) assetDir = path.join(templateDir, 'assets');
+console.log('Asset directory candidates:', assetCandidates);
+console.log('Using assetDir:', assetDir, 'exists:', fs.existsSync(assetDir));
+if (fs.existsSync(assetDir)) {
+  app.use('/assets', express.static(assetDir));
+}
+
 // API routes
 app.use('/health', healthRoutes);
 app.use('/api/auth', authRoutes);
