@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Client Dashboard | NAV Productions</title>
+  <link href="../assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet" />
+  <link href="../assets/css/style.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h4">Client Dashboard</h1>
+      <div>
+        <button id="signout" class="btn btn-outline-danger btn-sm">Sign Out</button>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h5>Your Bookings</h5>
+          <ul id="bookingsList" class="list-group list-group-flush"></ul>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h5>Your Orders</h5>
+          <ul id="ordersList" class="list-group list-group-flush"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <a href="file_manager.html" class="btn btn-secondary">Media Library</a>
+    </div>
+  </div>
+
+  <script>
+    async function fetchWhoami() {
+      try {
+        const r = await fetch('/api/auth/whoami', { credentials: 'same-origin' });
+        if (!r.ok) return null;
+        const j = await r.json();
+        return j.user;
+      } catch (e) { return null; }
+    }
+
+    async function load() {
+      const user = await fetchWhoami();
+      if (!user) return window.location.href = '/sign_in.html';
+      if (user.role === 'admin') {
+        // admins should not use client dashboard
+        return window.location.href = '/admin_orders.html';
+      }
+
+      // fetch bookings and orders
+      const [bkRes, orRes] = await Promise.all([
+        fetch('/api/client/bookings', { credentials: 'same-origin' }),
+        fetch('/api/client/orders', { credentials: 'same-origin' })
+      ]);
+      const bookings = bkRes.ok ? await bkRes.json() : [];
+      const orders = orRes.ok ? await orRes.json() : [];
+
+      const bList = document.getElementById('bookingsList');
+      const oList = document.getElementById('ordersList');
+      bList.innerHTML = bookings.map(b=>`<li class="list-group-item">${new Date(b.scheduledAt).toLocaleString()} - ${b.serviceName || 'Service'}</li>`).join('') || '<li class="list-group-item">No bookings</li>';
+      oList.innerHTML = orders.map(o=>`<li class="list-group-item">Order ${o.id} - ${o.paymentStatus} - $${(o.totalCents/100).toFixed(2)}</li>`).join('') || '<li class="list-group-item">No orders</li>';
+
+      document.getElementById('signout').addEventListener('click', async ()=>{
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
+        localStorage.removeItem('nav_token');
+        window.location.href = '/sign_in.html';
+      });
+    }
+
+    load();
+  </script>
+</body>
+</html>

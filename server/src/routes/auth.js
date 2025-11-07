@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { prisma, JWT_SECRET } = require('../config');
+const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -20,12 +21,19 @@ router.post('/register', async (req, res) => {
     });
 
     const token = jwt.sign({ sub: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
+      // Set HttpOnly cookie for browser flows
+      res.cookie('nav_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 7 * 24 * 60 * 60 * 1000 });
+      res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'server error' });
   }
 });
+
+  // GET /api/auth/whoami - return current user from cookie/token
+  router.get('/whoami', authenticate, async (req, res) => {
+    res.json({ user: req.user });
+  });
 
 // Login
 router.post('/login', async (req, res) => {
@@ -40,11 +48,19 @@ router.post('/login', async (req, res) => {
     if (!ok) return res.status(401).json({ error: 'invalid credentials' });
 
     const token = jwt.sign({ sub: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    // set HttpOnly cookie for browser flows
+    res.cookie('nav_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 7 * 24 * 60 * 60 * 1000 });
     res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'server error' });
   }
+});
+
+// Logout - clears cookie
+router.post('/logout', (req, res) => {
+  res.clearCookie('nav_token');
+  res.json({ ok: true });
 });
 
 module.exports = router;

@@ -74,17 +74,17 @@
                                 </div>
                                 <div class="col-12">
                                     <div class="form-floating mb-3">
-                                        <input class="form-control" id="UserName" placeholder="Email Username"
-                                               type="text">
-                                        <label for="UserName">Username</label>
+                                        <input class="form-control" id="email" placeholder="name@example.com"
+                                               type="email" autocomplete="username">
+                                        <label for="email">Email</label>
                                     </div>
                                 </div>
                                 <div class="col-12">
 
                                     <div class="form-floating mb-3">
-                                        <input class="form-control" id="floatingInput" placeholder="Email Username"
-                                               type="text">
-                                        <label for="floatingInput">Password</label>
+                                        <input class="form-control" id="password" placeholder="Password"
+                                               type="password" autocomplete="current-password">
+                                        <label for="password">Password</label>
 
                                     </div>
                                     <div class="text-end ">
@@ -116,26 +116,45 @@
                                 </div>
 
             <script>
-            // Minimal login handler: posts to /api/auth/login and stores token in localStorage
+            // Minimal login handler: posts to /api/auth/login and redirects by role
             (function(){
                 const btn = document.getElementById('signinBtn');
                 if (!btn) return;
                 btn.addEventListener('click', async function(){
-                    const email = document.querySelector('input[type="text"]').value; // Changed to match the input type for email
-                    const password = document.querySelector('input[type="password"]').value;
+                    const emailEl = document.getElementById('email');
+                    const pwdEl = document.getElementById('password');
+                    const email = emailEl && emailEl.value && emailEl.value.trim();
+                    const password = pwdEl && pwdEl.value;
                     if (!email || !password) { alert('Email and password required'); return; }
                     try {
                         const res = await fetch('/api/auth/login', {
                             method: 'POST',
+                            credentials: 'same-origin',
                             headers: {'Content-Type':'application/json'},
                             body: JSON.stringify({ email, password })
                         });
                         const data = await res.json();
                         if (!res.ok) { alert(data.error || 'Login failed'); return; }
-                        // store token
-                        localStorage.setItem('nav_token', data.token);
-                        // redirect to app dashboard
-                        window.location.href = '/app';
+                        // server already sets HttpOnly cookie; keep localStorage token for non-cookie clients
+                        if (data.token) localStorage.setItem('nav_token', data.token);
+                        // Use returned user role when available, otherwise ask whoami
+                        const role = data.user && data.user.role;
+                        if (role === 'admin') {
+                            window.location.href = '/admin_orders.html';
+                        } else if (role === 'client') {
+                            window.location.href = '/client_dashboard.html';
+                        } else {
+                            // fallback: call whoami then redirect
+                            try {
+                                const who = await fetch('/api/auth/whoami');
+                                const whoData = await who.json();
+                                const r = whoData && whoData.user && whoData.user.role;
+                                if (r === 'admin') window.location.href = '/admin_orders.html';
+                                else window.location.href = '/client_dashboard.html';
+                            } catch (e) {
+                                window.location.href = '/client_dashboard.html';
+                            }
+                        }
                     } catch (err) {
                         console.error(err);
                         alert('Network error');

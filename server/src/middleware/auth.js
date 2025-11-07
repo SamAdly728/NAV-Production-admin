@@ -3,8 +3,15 @@ const { prisma, JWT_SECRET } = require('../config');
 
 async function authenticate(req, res, next) {
   const auth = req.headers.authorization || req.headers.Authorization;
-  if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ error: 'missing token' });
-  const token = auth.split(' ')[1];
+  let token;
+  if (auth && auth.startsWith('Bearer ')) {
+    token = auth.split(' ')[1];
+  } else if (req.headers.cookie && req.headers.cookie.includes('nav_token=')) {
+    // parse cookie header for nav_token
+    const m = req.headers.cookie.split(';').map(s=>s.trim()).find(s=>s.startsWith('nav_token='));
+    if (m) token = m.split('=')[1];
+  }
+  if (!token) return res.status(401).json({ error: 'missing token' });
   try {
     const payload = jwt.verify(token, JWT_SECRET);
     const user = await prisma.user.findUnique({ where: { id: payload.sub } });

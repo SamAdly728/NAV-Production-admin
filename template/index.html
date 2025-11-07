@@ -1765,6 +1765,41 @@
 <!-- App js-->
 <script src="../assets/js/script.js"></script>
 
+<!-- Auto-redirect logged-in users to their dashboard -->
+<script>
+    (function(){
+        // only run on the site root or explicit index page
+        const p = window.location.pathname.replace(/\/+$/, '');
+        if (p !== '' && p !== '/' && p !== '/index.html') return;
+        fetch('/api/auth/whoami', { credentials: 'same-origin' })
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (!data || !data.user) return; // not logged in
+                const role = data.user.role;
+                        if (role === 'admin') window.location.href = '/admin_orders.html';
+                        else window.location.href = '/client_dashboard.html';
+            }).catch(()=>{});
+    })();
+</script>
+
+    <script>
+        // hide admin links for non-admin users in the nav
+        (function(){
+            fetch('/api/auth/whoami', { credentials: 'same-origin' })
+                .then(r => r.ok ? r.json() : null)
+                .then(data => {
+                    if (!data || !data.user) return;
+                    if (data.user.role === 'admin') return; // admins keep links
+                    // remove or hide links that point to admin pages
+                    document.querySelectorAll('a[href*="admin_"]').forEach(a=>{
+                        const li = a.closest('li');
+                        if (li) li.remove(); else a.remove();
+                    });
+                    document.querySelectorAll('a[href*="/admin/"]').forEach(a=>{ const li = a.closest('li'); if (li) li.remove(); else a.remove(); });
+                }).catch(()=>{});
+        })();
+    </script>
+
 </body>
 
 </html>
