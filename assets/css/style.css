@@ -34782,3 +34782,24 @@ body.dark nav .app-logo .logo img {
     display: none;
   }
 }
+
+/* Custom logo override: hide existing <img> and show hosted logo consistently */
+.app-logo .logo img { visibility: hidden !important; }
+.app-logo .logo::before {
+  content: '';
+  display: inline-block;
+  width: 120px;
+  height: 40px;
+  background-image: url('https://storage.googleapis.com/msgsndr/kst2bkxitM1nA0d1KJd4/media/6901a25fff3e44e0bbf9c102.jpeg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+}
+
+/* smaller logo for compact/auth pages */
+.sign-in-bg .app-logo .logo::before,
+.form-container .app-logo .logo::before {
+  width: 100px;
+  height: 36px;
+}
+
