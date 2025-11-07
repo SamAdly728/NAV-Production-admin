@@ -1,5 +1,5 @@
 {
-  "name": "ki-admin",
+  "name": "nav-productions-admin",
   "version": "1.0.0",
   "dependencies": {
     "accepts": "^1.3.8",
@@ -390,14 +390,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/archanadholariya/Mavis.git"
+    "url": "git+https://github.com/SamAdly728/NAV-Production-admin.git"
   },
-  "author": "",
+  "author": "NAV Productions <info@nav-productions.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/archanadholariya/Mavis/issues"
+    "url": "https://github.com/SamAdly728/NAV-Production-admin/issues"
   },
-  "homepage": "https://github.com/archanadholariya/Mavis#readme",
-  "keywords": [],
-  "description": ""
+  "homepage": "https://github.com/SamAdly728/NAV-Production-admin#readme",
+  "keywords": ["nav","productions","admin","dashboard"],
+  "description": "NAV Productions admin dashboard and client portal"
 }
