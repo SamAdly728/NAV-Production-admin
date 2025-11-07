@@ -62,7 +62,6 @@ app.get('/', (req, res) => res.sendFile(path.join(templateDir, 'index.html')));
 app.get('/app', (req, res) => res.sendFile(path.join(templateDir, 'index.html')));
 
 // Debug endpoints to help diagnose live-site blank pages
-const fs = require('fs');
 app.get('/_status', (req, res) => {
   try {
     const exists = fs.existsSync(templateDir);
