@@ -11,12 +11,25 @@
   <link href="../assets/css/style.css" rel="stylesheet" />
 </head>
 <body>
-  <div class="container py-5">
+  <!-- Top header: logo + sign out -->
+  <header class="header-main">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-6 d-flex align-items-center">
+          <a class="logo d-inline-block" href="/">
+            <img alt="NAV Productions" src="https://storage.googleapis.com/msgsndr/kst2bkxitM1nA0d1KJd4/media/6901a25fff3e44e0bbf9c102.jpeg" style="height:36px;object-fit:contain;">
+          </a>
+        </div>
+        <div class="col-6 text-end">
+          <button id="signout" class="btn btn-outline-danger btn-sm">Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1 class="h4">Client Dashboard</h1>
-      <div>
-        <button id="signout" class="btn btn-outline-danger btn-sm">Sign Out</button>
-      </div>
     </div>
 
     <div class="row g-3">
@@ -37,7 +50,7 @@
     <div class="mt-4">
       <a href="file_manager.html" class="btn btn-secondary">Media Library</a>
     </div>
-  </div>
+  </main>
 
   <script>
     async function fetchWhoami() {
