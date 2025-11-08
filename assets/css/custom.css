@@ -1,0 +1,28 @@
+/* Custom overrides for NAV Productions */
+
+/* Make footer non-sticky */
+div > footer {
+  position: relative !important;
+  bottom: auto !important;
+  padding: 0.75rem 2.5rem !important;
+  left: auto !important;
+  width: 100% !important;
+  z-index: auto !important;
+}
+
+div .semi-nav ~ footer {
+  position: relative !important;
+  padding: 0.75rem 2.5rem !important;
+}
+
+.app-wrapper .semi-nav ~ .app-content footer {
+  position: relative !important;
+}
+
+.app-wrapper nav.horizontal-sidebar ~ footer {
+  position: relative !important;
+}
+
+.app-wrapper nav.horizontal-sidebar ~ .app-content footer {
+  position: relative !important;
+}

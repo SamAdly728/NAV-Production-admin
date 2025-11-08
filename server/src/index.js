@@ -71,12 +71,18 @@ app.use('/api/admin', adminRoutes);
 // client routes
 const clientRoutes = require('./routes/client');
 app.use('/api/client', clientRoutes);
+// project routes
+const projectRoutes = require('./routes/projects');
+app.use('/api/projects', projectRoutes);
 
-// Serve the main UI at the root so visitors see the template
-app.get('/', (req, res) => res.sendFile(path.join(templateDir, 'index.html')));
+// Serve the main UI at the root - redirect to sign_in
+app.get('/', (req, res) => res.redirect('/sign_in.html'));
 
-// A simple route to serve index.html from template
-app.get('/app', (req, res) => res.sendFile(path.join(templateDir, 'index.html')));
+// Admin dashboard is index.html - protected
+app.get('/index.html', authenticate, (req, res) => {
+  if (!req.user || req.user.role !== 'admin') return res.status(403).send('Forbidden - Admin access required');
+  res.sendFile(path.join(templateDir, 'index.html'));
+});
 
 // Debug endpoints to help diagnose live-site blank pages
 app.get('/_status', (req, res) => {

@@ -8,28 +8,32 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String    @id @default(cuid())
+  email     String    @unique
   password  String
   name      String?
-  role      String   @default("client") // "admin" or "client"
-  createdAt DateTime @default(now())
-  orders    Order[]  @relation("ClientOrders")
+  role      String    @default("client") // "admin" or "client"
+  phone     String?
+  createdAt DateTime  @default(now())
+  orders    Order[]   @relation("ClientOrders")
   bookings  Booking[]
+  projects  Project[]
+  payments  Payment[]
 }
 
 model Order {
-  id         String   @id @default(cuid())
-  client     User     @relation(fields: [clientId], references: [id], name: "ClientOrders")
-  clientId   String
-  status     String   @default("new")
-  totalCents Int      @default(0)
+  id                    String    @id @default(cuid())
+  client                User      @relation(fields: [clientId], references: [id], name: "ClientOrders")
+  clientId              String
+  status                String    @default("new")
+  totalCents            Int       @default(0)
   stripePaymentIntentId String?
-  paymentStatus String @default("pending")
-  updatedAt  DateTime @updatedAt
-  createdAt  DateTime @default(now())
-  media      Media[]
-  bookings   Booking[]
+  paymentStatus         String    @default("pending")
+  updatedAt             DateTime  @updatedAt
+  createdAt             DateTime  @default(now())
+  media                 Media[]
+  bookings              Booking[]
+  project               Project?
 }
 
 model Media {
@@ -51,11 +55,11 @@ model Service {
 }
 
 model Booking {
-  id         String   @id @default(cuid())
-  client     User     @relation(fields: [clientId], references: [id])
-  clientId   String
-  service    Service? @relation(fields: [serviceId], references: [id])
-  serviceId  String?
+  id          String   @id @default(cuid())
+  client      User     @relation(fields: [clientId], references: [id])
+  clientId    String
+  service     Service? @relation(fields: [serviceId], references: [id])
+  serviceId   String?
   scheduledAt DateTime
   location    String?
   notes       String?
@@ -63,4 +67,59 @@ model Booking {
   createdAt   DateTime @default(now())
   order       Order?   @relation(fields: [orderId], references: [id])
   orderId     String?
+}
+
+model Project {
+  id          String          @id @default(cuid())
+  client      User            @relation(fields: [clientId], references: [id])
+  clientId    String
+  order       Order           @relation(fields: [orderId], references: [id])
+  orderId     String          @unique
+  title       String
+  description String?
+  stage       String          @default("booked") // booked, in_production, delivered
+  progress    Int             @default(0) // 0-100
+  dueDate     DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  tasks       ProjectTask[]
+  uploads     ProjectUpload[]
+}
+
+model ProjectTask {
+  id          String   @id @default(cuid())
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId   String
+  title       String
+  description String?
+  status      String   @default("pending") // pending, in_progress, completed
+  assignedTo  String?  // "admin" or client email
+  dueDate     DateTime?
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+}
+
+model ProjectUpload {
+  id        String   @id @default(cuid())
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  url       String
+  fileName  String
+  fileType  String   // image, video, document
+  uploadedBy String  // email of uploader
+  createdAt DateTime @default(now())
+}
+
+model Payment {
+  id             String   @id @default(cuid())
+  client         User     @relation(fields: [clientId], references: [id])
+  clientId       String
+  amountCents    Int
+  currency       String   @default("usd")
+  status         String   @default("pending") // pending, completed, failed, refunded
+  paymentMethod  String?  // card, bank_transfer, cash
+  stripePaymentId String?
+  description    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }

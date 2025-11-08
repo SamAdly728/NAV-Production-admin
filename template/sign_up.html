@@ -115,7 +115,7 @@
                                 </div>
                                 <div class="col-12">
                                     <div class="mb-3">
-                                        <a class="btn btn-primary w-100" href="./index.html" role="button">Sign Up</a>
+                                        <button id="signupBtn" class="btn btn-primary w-100" type="button">Sign Up</button>
                                     </div>
                                 </div>
                                 <div class="col-12">
@@ -158,6 +158,66 @@
 
 <!-- Bootstrap js-->
 <script src="../assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+
+<script>
+// Sign up handler
+(function(){
+    const btn = document.getElementById('signupBtn');
+    if (!btn) return;
+    btn.addEventListener('click', async function(){
+        const nameEl = document.getElementById('UserName');
+        const emailEl = document.getElementById('email');
+        const pwdEl = document.getElementById('password');
+        const pwd2El = document.getElementById('password1');
+        const termsEl = document.getElementById('checkDefault');
+        
+        const name = nameEl && nameEl.value && nameEl.value.trim();
+        const email = emailEl && emailEl.value && emailEl.value.trim();
+        const password = pwdEl && pwdEl.value;
+        const password2 = pwd2El && pwd2El.value;
+        
+        if (!email || !password) { 
+            alert('Email and password required'); 
+            return; 
+        }
+        if (password !== password2) {
+            alert('Passwords do not match');
+            return;
+        }
+        if (termsEl && !termsEl.checked) {
+            alert('Please accept the terms and conditions');
+            return;
+        }
+        
+        try {
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ email, password, name: name || email.split('@')[0] })
+            });
+            const data = await res.json();
+            if (!res.ok) { 
+                alert(data.error || 'Registration failed'); 
+                return; 
+            }
+            // Save token
+            if (data.token) localStorage.setItem('nav_token', data.token);
+            
+            // Redirect based on role (new users default to 'client')
+            const role = data.user && data.user.role;
+            if (role === 'admin') {
+                window.location.href = '/index.html';
+            } else {
+                window.location.href = '/client_dashboard.html';
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Network error');
+        }
+    });
+})();
+</script>
 
 </body>
 
