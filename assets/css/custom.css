@@ -26,3 +26,25 @@ div .semi-nav ~ footer {
 .app-wrapper nav.horizontal-sidebar ~ .app-content footer {
   position: relative !important;
 }
+
+/* Fix logo spacing - remove extra margin/padding below logo */
+.app-logo {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.app-logo img {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.app-logo .logo {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Ensure nav profile section is directly below logo */
+.app-logo .nav-profile {
+  margin-top: 0 !important;
+  padding-top: 0.75rem !important;
+}

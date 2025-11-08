@@ -137,16 +137,16 @@
                         // Use returned user role when available, otherwise ask whoami
                         const role = data.user && data.user.role;
                         if (role === 'admin') {
-                            window.location.href = '/admin_orders.html';
+                            window.location.href = '/index.html';
                         } else if (role === 'client') {
                             window.location.href = '/client_dashboard.html';
                         } else {
                             // fallback: call whoami then redirect
                             try {
-                                const who = await fetch('/api/auth/whoami');
+                                const who = await fetch('/api/auth/whoami', { credentials: 'same-origin' });
                                 const whoData = await who.json();
                                 const r = whoData && whoData.user && whoData.user.role;
-                                if (r === 'admin') window.location.href = '/admin_orders.html';
+                                if (r === 'admin') window.location.href = '/index.html';
                                 else window.location.href = '/client_dashboard.html';
                             } catch (e) {
                                 window.location.href = '/client_dashboard.html';

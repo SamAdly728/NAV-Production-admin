@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('express').json;
+const cookieParser = require('cookie-parser');
 const path = require('path');
 const { PORT, prisma } = require('./config');
 
@@ -9,12 +10,13 @@ const healthRoutes = require('./routes/health');
 const mediaRoutes = require('./routes/media');
 const paymentsRoutes = require('./routes/payments');
 const adminRoutes = require('./routes/admin');
-const { authenticate } = require('./middleware/auth');
+const { authenticate, authenticateHTML } = require('./middleware/auth');
 
 const app = express();
 
 app.use(cors());
 app.use(bodyParser());
+app.use(cookieParser());
 
 // Resolve template directory from several likely locations (Render may set different workdir layouts)
 const fs = require('fs');
@@ -32,8 +34,8 @@ console.log('Template directory candidates:', candidates);
 console.log('Using templateDir:', templateDir, 'exists:', fs.existsSync(templateDir));
 
 // Protect admin template pages: require admin auth for any /admin_*.html or /admin/* routes
-app.get(['/admin_*.html', '/admin/*'], authenticate, (req, res, next) => {
-  if (!req.user || req.user.role !== 'admin') return res.status(403).send('Forbidden');
+app.get(['/admin_*.html', '/admin/*'], authenticateHTML, (req, res, next) => {
+  if (!req.user || req.user.role !== 'admin') return res.redirect('/sign_in.html');
   // serve the requested file from templateDir
   const reqPath = req.path.replace(/^\//, '');
   const filePath = path.join(templateDir, reqPath);
@@ -42,7 +44,26 @@ app.get(['/admin_*.html', '/admin/*'], authenticate, (req, res, next) => {
   });
 });
 
-// Serve static assets and template pages
+// Serve static assets and template pages (but check auth for certain pages)
+// Sign in and sign up are public
+app.get(['/sign_in.html', '/sign_up.html', '/forgot_password.html'], (req, res, next) => {
+  const reqPath = req.path.replace(/^\//, '');
+  const filePath = path.join(templateDir, reqPath);
+  return res.sendFile(filePath, (err) => {
+    if (err) next(err);
+  });
+});
+
+// Client dashboard requires authentication
+app.get('/client_dashboard.html', authenticateHTML, (req, res, next) => {
+  if (!req.user) return res.redirect('/sign_in.html');
+  const filePath = path.join(templateDir, 'client_dashboard.html');
+  return res.sendFile(filePath, (err) => {
+    if (err) next(err);
+  });
+});
+
+// Serve remaining static assets
 app.use(express.static(templateDir));
 
 // Serve shared assets (images, css, js) from the project's assets folder if present
@@ -79,8 +100,8 @@ app.use('/api/projects', projectRoutes);
 app.get('/', (req, res) => res.redirect('/sign_in.html'));
 
 // Admin dashboard is index.html - protected
-app.get('/index.html', authenticate, (req, res) => {
-  if (!req.user || req.user.role !== 'admin') return res.status(403).send('Forbidden - Admin access required');
+app.get('/index.html', authenticateHTML, (req, res) => {
+  if (!req.user || req.user.role !== 'admin') return res.redirect('/sign_in.html');
   res.sendFile(path.join(templateDir, 'index.html'));
 });
 
