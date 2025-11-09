@@ -1,8 +1,9 @@
 services:
   - type: web
     name: nav-admin-panel
-    runtime: docker
-    dockerfilePath: ./Dockerfile
+    runtime: node
+    buildCommand: bash render-build.sh
+    startCommand: bash render-start.sh
     envVars:
       - key: APP_NAME
         value: NAV Admin
