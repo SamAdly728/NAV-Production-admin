@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: nav-admin-panel
+    env: php
+    buildCommand: ./build.sh
+    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: APP_NAME
+        value: NAV Admin
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: nav_productions_db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: nav_productions_db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: nav_productions_db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: nav_productions_db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: nav_productions_db
+          property: password
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: LOG_CHANNEL
+        value: errorlog
+
+databases:
+  - name: nav_productions_db
+    databaseName: nav_productions_db
+    user: nav_productions_db_user

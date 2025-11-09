@@ -1,0 +1,52 @@
+{
+  "resources/js/Pages/Admin/Dashboard.vue": {
+    "file": "assets/Dashboard-4342a4d8.js",
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "resources/js/Pages/Admin/Dashboard.vue"
+  },
+  "resources/js/Pages/Auth/Login.vue": {
+    "file": "assets/Login-9e7c622f.js",
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "resources/js/Pages/Auth/Login.vue"
+  },
+  "resources/js/Pages/Client/Dashboard.vue": {
+    "file": "assets/Dashboard-3bcf08cd.js",
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "resources/js/Pages/Client/Dashboard.vue"
+  },
+  "resources/js/Pages/Dashboard.vue": {
+    "file": "assets/Dashboard-29be68f7.js",
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "resources/js/Pages/Dashboard.vue"
+  },
+  "resources/js/app.css": {
+    "file": "assets/app-e3b0c442.css",
+    "src": "resources/js/app.css"
+  },
+  "resources/js/app.js": {
+    "css": [
+      "assets/app-e3b0c442.css"
+    ],
+    "dynamicImports": [
+      "resources/js/Pages/Admin/Dashboard.vue",
+      "resources/js/Pages/Auth/Login.vue",
+      "resources/js/Pages/Client/Dashboard.vue",
+      "resources/js/Pages/Dashboard.vue"
+    ],
+    "file": "assets/app-3666187e.js",
+    "isEntry": true,
+    "src": "resources/js/app.js"
+  }
+}
