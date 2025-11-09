@@ -2,6 +2,14 @@
 # exit on error
 set -o errexit
 
+echo "Installing PHP..."
+# Install PHP and required extensions
+apt-get update
+apt-get install -y php8.1 php8.1-cli php8.1-fpm php8.1-mysql php8.1-pgsql php8.1-mbstring php8.1-xml php8.1-curl php8.1-zip php8.1-gd
+
+echo "Installing Composer..."
+curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
 echo "Installing Composer dependencies..."
 composer install --no-dev --optimize-autoloader --no-interaction
 
