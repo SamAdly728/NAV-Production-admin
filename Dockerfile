@@ -46,40 +46,12 @@ RUN mkdir -p storage/framework/cache/data \
 RUN chown -R www-data:www-data storage bootstrap/cache
 RUN chmod -R 775 storage bootstrap/cache
 
-# Configure Nginx
-COPY <<EOF /etc/nginx/sites-available/default
-server {
-    listen 80;
-    server_name _;
-    root /var/www/html/public;
+# Copy nginx configuration
+COPY docker/nginx.conf /etc/nginx/sites-available/default
 
-    index index.php index.html;
-
-    location / {
-        try_files \$uri \$uri/ /index.php?\$query_string;
-    }
-
-    location ~ \.php$ {
-        fastcgi_pass 127.0.0.1:9000;
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-        include fastcgi_params;
-    }
-
-    location ~ /\.ht {
-        deny all;
-    }
-}
-EOF
-
-# Create start script
-RUN echo '#!/bin/bash\n\
-php artisan config:cache\n\
-php artisan route:cache\n\
-php artisan view:cache\n\
-php artisan migrate --force\n\
-php-fpm -D\n\
-nginx -g "daemon off;"' > /start.sh && chmod +x /start.sh
+# Copy start script
+COPY docker/start.sh /start.sh
+RUN chmod +x /start.sh
 
 # Expose port
 EXPOSE 80
