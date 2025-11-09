@@ -2,14 +2,19 @@
 # exit on error
 set -o errexit
 
-echo "Checking for PHP..."
-php --version || {
-    echo "Installing PHP using Heroku buildpack..."
-    curl -L https://heroku-buildpack-php.s3.amazonaws.com/dist-heroku-22-stable/php-8.1.30.tar.gz | tar xz -C /tmp
-    export PATH=/tmp/php/bin:$PATH
-    export LD_LIBRARY_PATH=/tmp/php/lib:$LD_LIBRARY_PATH
-}
+echo "Installing PHP using static binary..."
+# Download static PHP binary built for Linux
+mkdir -p $HOME/php
+cd $HOME/php
+curl -L https://github.com/crazywhalecc/static-php-cli/releases/download/2.2.0/php-8.1-cli-linux-x86_64.tar.gz -o php.tar.gz
+tar -xzf php.tar.gz
+rm php.tar.gz
 
+# Add to PATH
+export PATH=$HOME/php/bin:$PATH
+cd $HOME/repo
+
+echo "Verifying PHP installation..."
 php --version
 
 echo "Installing Composer..."

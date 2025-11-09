@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Add PHP to PATH
+export PATH=$HOME/php/bin:$PATH
+
 echo "Running migrations..."
 php artisan migrate --force --no-interaction
 
