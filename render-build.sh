@@ -2,19 +2,22 @@
 # exit on error
 set -o errexit
 
-echo "Installing PHP 8.1..."
-# Install PHP via apt-get (Render's Ubuntu environment)
-sudo apt-get update
-sudo apt-get install -y php8.1-cli php8.1-fpm php8.1-pgsql php8.1-mbstring php8.1-xml php8.1-curl php8.1-zip php8.1-gd php8.1-bcmath
+echo "Checking for PHP..."
+php --version || {
+    echo "Installing PHP using Heroku buildpack..."
+    curl -L https://heroku-buildpack-php.s3.amazonaws.com/dist-heroku-22-stable/php-8.1.30.tar.gz | tar xz -C /tmp
+    export PATH=/tmp/php/bin:$PATH
+    export LD_LIBRARY_PATH=/tmp/php/lib:$LD_LIBRARY_PATH
+}
+
+php --version
 
 echo "Installing Composer..."
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php composer-setup.php --quiet
-rm composer-setup.php
-mv composer.phar /usr/local/bin/composer
+curl -sS https://getcomposer.org/installer | php
+chmod +x composer.phar
 
 echo "Installing Composer dependencies..."
-composer install --no-dev --optimize-autoloader --no-interaction
+php composer.phar install --no-dev --optimize-autoloader --no-interaction
 
 echo "Installing NPM dependencies..."
 npm ci
